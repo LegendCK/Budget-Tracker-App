@@ -27,4 +27,26 @@ object TransactionRepository {
             throw e
         }
     }
+
+    suspend fun getIncome(): List<Income> {
+        return try {
+            db.collection("income")
+                .get()
+                .await()
+                .toObjects(Income::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun getExpenses(): List<Expense> {
+        return try {
+            db.collection("expenses")
+                .get()
+                .await()
+                .toObjects(Expense::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 }
