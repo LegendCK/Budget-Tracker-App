@@ -4,5 +4,6 @@ data class Income(
     val amt: Double = 0.0,
     val desc: String = "",
     val date: String = "",
-    val category: String = "Income"
+    val category: String = "Income",
+    val timestamp: Long = System.currentTimeMillis()
 )
