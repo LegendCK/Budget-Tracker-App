@@ -1,5 +1,6 @@
 package com.example.budgettrackerapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +10,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +43,9 @@ import co.yml.charts.common.model.PlotType
 import co.yml.charts.ui.piechart.charts.PieChart
 import co.yml.charts.ui.piechart.models.PieChartConfig
 import co.yml.charts.ui.piechart.models.PieChartData
+import com.composables.icons.lucide.ArrowDownRight
+import com.composables.icons.lucide.ArrowUpRight
+import com.composables.icons.lucide.Lucide
 import com.example.budgettrackerapp.data.model.Expense
 import com.example.budgettrackerapp.data.repository.CategoryRepository
 import com.example.budgettrackerapp.data.repository.TransactionRepository
@@ -68,7 +73,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dashboard") }
+                title = { Text("Dashboard",fontWeight = FontWeight.Bold) }
             )
         }
     ) { innerPadding ->
@@ -92,7 +97,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text("Current Balance", fontWeight = FontWeight.Bold)
-                    Text(String.format("%.2f", balance), fontWeight = FontWeight.Bold)
+                    Text("₹ ${String.format("%.2f", balance)}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.displayMedium)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     Row(
@@ -100,28 +105,49 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Income", color = Color.Green)
-                            Text(String.format("%.2f", income))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF34C759).copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Lucide.ArrowUpRight,
+                                    contentDescription = "Income Arrow",
+                                    tint = Color(0xFF34C759)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Income", color = Color(0xFF34C759))
+                                Text("₹ ${String.format("%.2f", income)}", fontWeight = FontWeight.Bold)
+                            }
                         }
 
-                        Icon(
-                            Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Income Arrow",
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("Expense", color = Color.Red)
-                            Text(String.format("%.2f", expense))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFFF9500).copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Lucide.ArrowDownRight,
+                                    contentDescription = "Expense Arrow",
+                                    tint = Color(0xFFFF9500)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Expense", color = Color(0xFFFF9500))
+                                Text("₹ ${String.format("%.2f", expense)}", fontWeight = FontWeight.Bold)
+                            }
                         }
-
-                        Icon(
-                            Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Expense Arrow",
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        )
                     }
+
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

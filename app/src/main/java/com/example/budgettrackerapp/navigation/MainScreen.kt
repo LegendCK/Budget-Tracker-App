@@ -1,32 +1,48 @@
 package com.example.budgettrackerapp.navigation
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.budgettrackerapp.ui.screens.*
+import com.composables.icons.lucide.CirclePlus
+import com.composables.icons.lucide.House
+import com.composables.icons.lucide.Layers
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Receipt
+import com.composables.icons.lucide.Settings
+import com.example.budgettrackerapp.ui.screens.AddTransactionScreen
+import com.example.budgettrackerapp.ui.screens.CategoriesScreen
+import com.example.budgettrackerapp.ui.screens.HomeScreen
+import com.example.budgettrackerapp.ui.screens.SettingsScreen
+import com.example.budgettrackerapp.ui.screens.TransactionsScreen
+import com.example.budgettrackerapp.utils.AppTheme
 
-sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object Transactions : Screen("transactions")
-    object AddTransaction : Screen("add_transaction")
-    object Categories : Screen("categories")
-    object Settings : Screen("settings")
+sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
+    object Home : Screen("home", "Home", Lucide.House)
+    object Transactions : Screen("transactions", "Transaction", Lucide.Receipt)
+    object AddTransaction : Screen("add_transaction", "Add", Lucide.CirclePlus)
+    object Categories : Screen("categories", "Categories", Lucide.Layers)
+    object Settings : Screen("settings", "Settings", Lucide.Settings)
 }
 
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(
+    navController: NavHostController,
+    currentTheme: AppTheme,
+    onThemeChange: (AppTheme) -> Unit
+) {
     Scaffold(
         bottomBar = { BottomBar(navController) }
     ) { innerPadding ->
@@ -39,7 +55,13 @@ fun MainScreen(navController: NavHostController) {
             composable(Screen.Transactions.route) { TransactionsScreen() }
             composable(Screen.AddTransaction.route) { AddTransactionScreen() }
             composable(Screen.Categories.route) { CategoriesScreen() }
-            composable(Screen.Settings.route) { SettingsScreen(context = LocalContext.current) }
+            composable(Screen.Settings.route) {
+                SettingsScreen(
+                    context = LocalContext.current,
+                    currentTheme = currentTheme,
+                    onThemeChange = onThemeChange
+                )
+            }
         }
     }
 }
@@ -54,13 +76,14 @@ fun BottomBar(navController: NavHostController) {
         Screen.Settings
     )
 
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
     NavigationBar {
-        val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
         items.forEach { screen ->
             NavigationBarItem(
-                selected = currentDestination == screen.route,
+                selected = currentRoute == screen.route,
                 onClick = {
-                    if (currentDestination != screen.route) {
+                    if (currentRoute != screen.route) {
                         navController.navigate(screen.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
@@ -71,15 +94,19 @@ fun BottomBar(navController: NavHostController) {
                     }
                 },
                 icon = {
-                    when (screen) {
-                        is Screen.Home -> Icon(Icons.Default.Home, contentDescription = "Home")
-                        is Screen.Transactions -> Icon(Icons.Default.List, contentDescription = "Transactions")
-                        is Screen.AddTransaction -> Icon(Icons.Default.Add, contentDescription = "Add")
-                        is Screen.Categories -> Icon(Icons.Default.ShoppingCart, contentDescription = "Categories")
-                        is Screen.Settings -> Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
+                    Icon(screen.icon, contentDescription = screen.label)
                 },
-                label = { Text(screen.route.replace('_', ' ').replaceFirstChar { it.uppercase() }) }
+                label = {
+                    Text(text = screen.label)
+                },
+                alwaysShowLabel = true,
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                )
             )
         }
     }

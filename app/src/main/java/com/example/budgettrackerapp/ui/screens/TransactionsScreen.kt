@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,10 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.composables.icons.lucide.Box
+import com.composables.icons.lucide.Lucide
 import com.example.budgettrackerapp.data.model.Expense
 import com.example.budgettrackerapp.data.model.Income
+import com.example.budgettrackerapp.data.repository.CategoryRepository
 import com.example.budgettrackerapp.data.repository.TransactionRepository
 import kotlinx.coroutines.launch
 
@@ -72,7 +74,7 @@ fun TransactionsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Transactions") }
+                title = { Text("Transactions",fontWeight = FontWeight.Bold) }
             )
         }
     ) { paddingValues ->
@@ -135,11 +137,28 @@ fun TransactionList(
 
 @Composable
 fun TransactionItem(transaction: Any, type: TransactionTab) {
+    // Get the category for the transaction
+    val category = when (transaction) {
+        is Income -> transaction.category
+        is Expense -> transaction.category
+        else -> "misc"
+    }
+    val categoryDetails = CategoryRepository.getCategories().find { it.name == category }
+
+    val icon = categoryDetails?.icon ?: Lucide.Box
+    val iconTint = categoryDetails?.iconTint ?: Color.White
+    val backgroundColor = categoryDetails?.color ?: Color.Gray
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -149,13 +168,13 @@ fun TransactionItem(transaction: Any, type: TransactionTab) {
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(if (type == TransactionTab.Income) Color(0xFF10B981) else Color(0xFFEF4444)),
+                    .background(backgroundColor),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = "Transaction Icon",
-                    tint = Color.White
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = iconTint
                 )
             }
 
@@ -167,14 +186,14 @@ fun TransactionItem(transaction: Any, type: TransactionTab) {
                     is Expense -> transaction.desc
                     else -> ""
                 }
-                val category = when (transaction) {
+                val categoryName = when (transaction) {
                     is Income -> transaction.category
                     is Expense -> transaction.category
                     else -> ""
                 }
 
                 Text(text = desc, style = MaterialTheme.typography.titleMedium)
-                Text(text = category, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text(text = categoryName, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
 
             val amt = when (transaction) {
@@ -191,3 +210,4 @@ fun TransactionItem(transaction: Any, type: TransactionTab) {
         }
     }
 }
+

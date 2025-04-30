@@ -57,6 +57,7 @@ dependencies {
     implementation ("androidx.preference:preference-ktx:1.2.0")
     implementation ("androidx.navigation:navigation-compose:2.5.0")
     implementation ("co.yml:ycharts:2.1.0")
+    implementation("com.composables:icons-lucide:1.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -7,10 +7,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.budgettrackerapp.ui.screens.*
+import com.example.budgettrackerapp.utils.AppTheme
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
+    currentTheme: AppTheme,
+    onThemeChange: (AppTheme) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -32,7 +35,11 @@ fun NavGraph(
             CategoriesScreen(modifier = modifier)
         }
         composable("settings") {
-            SettingsScreen(context = context)
+            SettingsScreen(
+                context = context,
+                currentTheme = currentTheme,
+                onThemeChange = onThemeChange
+            )
         }
     }
 }
